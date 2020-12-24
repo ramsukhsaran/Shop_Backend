@@ -2,26 +2,41 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 
-const Product = require('../models/productModel')
+const Product = require('../models/productModel')   // product model DB
 
 
 const auth = require('../middleware/auth');
 
 // get all products.
 router.get('/',async (req, res)=>{
+ 
+        const products = await  Product.find((err,products)=>{
+            if(!err){
+                return res.send(products);
 
-    try{
-        
-        const products = await  Product.find()
-         res.json(products);
+            }
+            else{
+                return res.send(err);
+            }
+        })
 
-
-    }catch(err){
-        res.status(500).json(err)
-    }
 
 })
+// get product by Id
+router.get('/productId/:id', async (req, res)=>{
+    
+   
+        const product = await Product.findOne({ProductId:req.params.id}) 
+        if(product){
+            res.json(product)
+        }
+        else{
+            res.status(500).json({msg:"product not found"})
+        }
 
+
+    
+})
 // adding products 
 router.post('/add',async (req, res)=>{
     const {ProductId,ProductTitle,ProductImgUrl,ProductDes,Price} = req.body
@@ -36,25 +51,44 @@ router.post('/add',async (req, res)=>{
 
     const savedProduct = await newProduct.save()
     if(savedProduct){
-        res.status(200).json(savedProduct)
+        res.status(200).json({msg:"Product is Added Successfully"})
     }
 
 })
 
-//delete product
+//update product 
+// http://localhost:5000/products/update/
+router.put('/update/:id',async (req, res)=>{
+    const product = await Product.findOne({ProductId: req.params.id})
+    product.ProductTitle=req.body.ProductTitle;
+    product.ProductDes=req.body.ProductDes;
+    product.ProductImgUrl=req.body.ProductImgUrl;
+    product.Price=req.body.Price;
 
-router.delete('/delete', async (req, res)=>{
-    const productId = req.body.ProductId
-    console.log(productId)
-    const productDelete = await Product.deleteOne({ProductId:productId})
+    //save product db
+    await product.save((err)=>{
+        if(!err){
+            res.status(200).json({msg:"Updated Successfully"})
+        } else{
+            res.send(err)
+        }
+    })
+
+})
+
+//delete product
+// http:localhost/products/delete/
+router.delete('/delete/:id', async (req, res)=>{
     
-     
-    if(productDelete){
-        res.status(204).json({msg:"Product deleted successfully"})
-    }
-    else{
-        res.status(404).json({msg:"Can Not Process This request Error !"})
-    }
+    const product = await Product.findOne({ProductId: req.params.id})
+    product.remove((err)=>{
+        if(!err){
+            return res.json({msg:"Deleted Successfully"})
+        } else{
+            return res.json(err)
+        }
+    })
+  
 
 })
 
