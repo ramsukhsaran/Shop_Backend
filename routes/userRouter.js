@@ -6,6 +6,7 @@ const User = require('../models/userModel')   // for user model to intract with 
 
 const auth= require('..//middleware/auth')   // for delete only loged in user (private route)
 
+
 router.post('/register', async(req, res) => {
     try {
         const { email, password, passwordCheck, name,mobileno,address,role } = req.body

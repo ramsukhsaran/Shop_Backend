@@ -4,12 +4,8 @@ const cors=require('cors')
 const bodyParser=require('body-parser')
 require('dotenv').config()
 
-// set up mongoose
-// connecting database
-// mongoose.connect('mongodb+srv://user1:user1@booking-xfqri.mongodb.net/Bus-Booking?retryWrites=true&w=majority',{ useUnifiedTopology: true } )
-//         .then(()=>console.log('connected with mongodb'))
-//         .catch(err => console.log(err))
 
+// set up mongoose
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING,{ useUnifiedTopology: true })
         .then(()=>console.log('connected with mongodb'))
         .catch(err => console.log(err))
@@ -26,13 +22,11 @@ app.use(express.urlencoded({extended:false}))
 app.use(cors())
 
 
-
-
-
 // set up for routes
-app.use("/users",require("./routes/userRouter"))
 
+app.use("/users",require("./routes/userRouter"))
 app.use("/products",require('./routes/productRouter'))
+app.use("/cart",require('./routes/cartRouter'))
 
 
 

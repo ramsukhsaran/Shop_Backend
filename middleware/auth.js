@@ -17,8 +17,14 @@ const auth = (req, res, next) => {
           .status(401)
           .json({ msg: "Token verification failed, authorization denied." });
   
-    req.user=verified.id  // we need this id is loged in user id so that we can delete
-    next()
+    // req.user=verified.id  // we need this id is loged in user id so that we can delete
+    const role=verified.role
+    if(role==='admin'){
+      next()
+    }else{
+      return res.json({ msg: "Only Admin can Process Further"})
+    }
+    
 
     } catch (err) {
       res.status(500).json({ error: err.message });

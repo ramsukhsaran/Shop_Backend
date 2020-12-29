@@ -7,6 +7,8 @@ const Product = require('../models/productModel')   // product model DB
 
 const auth = require('../middleware/auth');
 
+
+
 // get all products.
 router.get('/',async (req, res)=>{
  
@@ -38,7 +40,8 @@ router.get('/productId/:id', async (req, res)=>{
     
 })
 // adding products 
-router.post('/add',async (req, res)=>{
+
+router.post('/add',auth,async (req, res)=>{
     const {ProductId,ProductTitle,ProductImgUrl,ProductDes,Price} = req.body
     const newProduct = new Product({
         ProductId,
@@ -58,7 +61,7 @@ router.post('/add',async (req, res)=>{
 
 //update product 
 // http://localhost:5000/products/update/
-router.put('/update/:id',async (req, res)=>{
+router.put('/update/:id',auth,async (req, res)=>{
     const product = await Product.findOne({ProductId: req.params.id})
     product.ProductTitle=req.body.ProductTitle;
     product.ProductDes=req.body.ProductDes;
@@ -78,16 +81,19 @@ router.put('/update/:id',async (req, res)=>{
 
 //delete product
 // http:localhost/products/delete/
-router.delete('/delete/:id', async (req, res)=>{
+router.delete('/delete/:id',auth, async (req, res)=>{
     
     const product = await Product.findOne({ProductId: req.params.id})
-    product.remove((err)=>{
-        if(!err){
-            return res.json({msg:"Deleted Successfully"})
-        } else{
-            return res.json(err)
-        }
-    })
+    if(product){
+        product.remove((err)=>{
+            if(!err){
+                return res.json({msg:"Deleted Successfully"})
+            } else{
+                return res.json({msg:"Can't update"})
+            }
+        })
+    }
+   
   
 
 })
