@@ -74,16 +74,17 @@ router.put('/update/:id',async (req,res)=>{
 })
 
 router.delete('/delete/:id', async (req, res)=>{
+    const {productId} = req.body
     const cart  = await Cart.findOne({ userId: req.params.id})
+    console.log(cart.items)
     if(cart){
-        cart.remove((err)=>{
-            if(!err){
-                return res.json({ msg:'cart successfully removed'})
 
-            }else{
-                return res.json('item not found')
-            }
-        })
+        let items = cart.items.filter(I => I.productId !== productId)
+        cart.items = items
+        await cart.save()
+        return res.json({msg:'deleted successfully'})
+    }else{
+        res.json({msg:'failed to Delete'})
     }
 
 })
